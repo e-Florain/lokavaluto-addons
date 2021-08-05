@@ -18,45 +18,57 @@ class PartnerIndustryService(Component):
     """
 
     @restapi.method(
-        [(["/get"], "GET")],
-        input_param=Datamodel("partner.industry.info"),
+        [(["/", "/get"], "GET")],
+        input_param=Datamodel("partner.industry.info.param"),
+        output_param=Datamodel("partner.industry.info.response.list")
     )
-    def get_industry_info(self, partner_industry_info):
+    def get_partner_industry_info(self, partner_industry_info):
         """
         Get the complete list of partner indutries
         """
         ids = partner_industry_info.ids
-        all_industries = self.env['res.partner.industry'].sudo()
+        # Domain construction
+        domain = [('active', '=', True)]
         if ids:
-            industries = all_industries.search([('active', '=', True),('id', 'in', ids)])
-        else:
-            industries = all_industries.search([('active', '=', True)])
-        parser = self._get_partner_industry_parser()
-        rows = industries.jsonify(parser)
-        res = {"count": len(industries), "rows": rows}
+            domain.append(('id', 'in', ids))
+        _logger.debug('DOMAIN = %s' % domain)
+        # Partner indutries retrieval
+        partner_indutries = self.env['res.partner.industry'].search(domain)
+        _logger.debug('INDUSTRIES = %s' % partner_indutries)
+
+        # Construction of the answer
+        PartnerIndustryInfoResponseList = self.env.datamodels["partner.industry.info.response.list"]
+        PartnerIndustryInfoResponse = self.env.datamodels["partner.industry.info.response"]
+        res = PartnerIndustryInfoResponseList(count=len(partner_indutries), rows=[])        
+        for industry in partner_indutries:
+            industry_info = PartnerIndustryInfoResponse(id=industry.id, name = industry.name)
+            _logger.debug('INDUSTRY INFO = %s' % industry_info)
+            res.rows.append(industry_info)
         return res
 
-    def _validator_return_get(self):
-        res = {
-            "count": {"type": "integer", "required": True},
-            "rows": {
-                "type": "list",
-                "required": True,
-                "schema": {"type": "dict", "schema": self._return_partner_industry()},
-            },
-        }
-        return res
 
-    def _return_partner_industry(self):
-        res = {
-            "id": {"type": "integer", "required": True, "nullable": False},
-            "name": {"type": "string", "required": True, "empty": True},    
-        }
-        return res
 
-    def _get_partner_industry_parser(self):
-        parser = [
-            'id',
-            'name',
-        ]
-        return parser
+    # def _validator_return_get(self):
+    #     res = {
+    #         "count": {"type": "integer", "required": True},
+    #         "rows": {
+    #             "type": "list",
+    #             "required": True,
+    #             "schema": {"type": "dict", "schema": self._return_partner_industry()},
+    #         },
+    #     }
+    #     return res
+
+    # def _return_partner_industry(self):
+    #     res = {
+    #         "id": {"type": "integer", "required": True, "nullable": False},
+    #         "name": {"type": "string", "required": True, "empty": True},
+    #     }
+    #     return res
+
+    # def _get_partner_industry_parser(self):
+    #     parser = [
+    #         'id',
+    #         'name',
+    #     ]
+    #     return parser
