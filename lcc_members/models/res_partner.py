@@ -131,6 +131,23 @@ class res_partner(models.Model):
         'partner_id',
         string='Images')
 
+    is_organization = fields.Boolean(
+        string=_("is Organization"),
+        required=False,
+        translate=False,
+        readonly=False
+    )
+
+    orga_choice = fields.Many2one(
+        'res.partner',
+        string=_("Organization choice"),
+        required=False,
+        translate=False,
+        readonly=False,
+        domain="[('is_organization', '=', 'True')]"
+    )
+
+
     @api.onchange('firstname', 'lastname')
     def onchange_upper_name(self):
         if self.lastname and self.lastname != self.lastname.upper():

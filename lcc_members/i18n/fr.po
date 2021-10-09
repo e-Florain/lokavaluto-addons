@@ -237,6 +237,9 @@ msgstr ""
 msgid "Currency exchange office"
 msgstr "Comptoir de change"
 
+msgid "is Organization"
+msgstr "Est une association"
+
 #. module: lcc_members
 #: model_terms:ir.ui.view,arch_db:lcc_members.members_search_view
 msgid "Customers"

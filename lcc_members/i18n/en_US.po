@@ -822,6 +822,9 @@ msgstr ""
 msgid "currency exchange office"
 msgstr ""
 
+msgid "is Organization"
+msgstr ""
+
 #. module: mlc_members
 #: model_terms:ir.ui.view,arch_db:mlc_members.{Lokavaluto-Members} Main Members view_view
 msgid "e.g. BE0477472701"
