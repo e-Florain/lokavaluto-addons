@@ -81,7 +81,7 @@
                             <field name="nic" class="oe_inline"/>
                         </div>
                         <div class="o_row">
-                            <field name="parent_id" widget="res_partner_many2one" placeholder="Linked company member" domain="[('is_company', '=', True)]" context="{'default_is_company': True, 'default_supplier': supplier, 'default_customer': customer, 'show_vat': True}" attrs="{'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}"/>
+                            <field name="parent_id" invisible="1" widget="res_partner_many2one" placeholder="Linked company member" domain="[('is_company', '=', True)]" context="{'default_is_company': True, 'default_supplier': supplier, 'default_customer': customer, 'show_vat': True}" attrs="{'invisible': ['|', '&amp;', ('is_company','=', True),('parent_id', '=', False),('company_name', '!=', False),('company_name', '!=', '')]}"/>
                             <field name="company_name" attrs="{'invisible': ['|', '|', ('company_name', '=', False), ('company_name', '=', ''), ('is_company', '=', True)]}"/>
                             <button name="create_company" type="object" class="oe_edit_only btn-link" attrs="{'invisible': ['|', '|', ('is_company','=', True), ('company_name', '=', ''), ('company_name', '=', False)]}">
                                 <span class="fa fa-plus-square"/>
@@ -98,19 +98,19 @@
                                 <div attrs="{'invisible': ['|', ('parent_id', '=', False), ('type', '!=', 'contact')]}" class="oe_edit_only">
                                     <b>Company Address:</b>
                                 </div>
-                                <field name="street" placeholder="Street or legal name" class="o_address_street" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                                <field name="street2" placeholder="Street 2..." class="o_address_street" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                                <field name="zip_id" options="{'create_name_field': 'city', 'no_open': True, 'no_create': True}" placeholder="Location completion" class="oe_edit_only" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="street" placeholder="Street or legal name" class="o_address_street" attrs="{'invisible': [('is_company', '=', False)], 'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street" attrs="{'invisible': [('is_company', '=', False)], 'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="zip_id" invisible="1" options="{'create_name_field': 'city', 'no_open': True, 'no_create': True}" placeholder="Location completion" class="oe_edit_only" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
                                 <field name="city" placeholder="City" class="o_address_city" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                                <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" context="{'country_id': country_id, 'zip': zip}"/>
+                                <field name="state_id" invisible="1" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}" context="{'country_id': country_id, 'zip': zip}"/>
                                 <field name="zip" placeholder="ZIP" class="o_address_zip" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
-                                <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
+                                <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'invisible': [('is_company', '=', False)], 'readonly': [('type', '=', 'contact'),('parent_id', '!=', False)]}"/>
                             </div>
                             <field name="team_id" string="Local group" options="{'limit': 16, 'create': false, 'create_edit': false}"/>
-                            <field name="user_id" string="Referent" />
+                            <field name="user_id" string="Referent" attrs="{'invisible': [('is_company', '=', False)]}"/>
 
-                            <field name="vat" placeholder="e.g. BE0477472701" attrs="{'invisible': [('is_company', '=', False)]}" widget="field_partner_autocomplete"/>
-                            <field name="company_registry" attrs="{'invisible': [('is_company', '=', False)]}"/>
+                            <field name="vat" invisible="1" placeholder="e.g. BE0477472701" attrs="{'invisible': [('is_company', '=', False)]}" widget="field_partner_autocomplete"/>
+                            <field name="company_registry" invisible="1" attrs="{'invisible': [('is_company', '=', False)]}"/>
                             <field name="ref" string="Subcription number"/>
                             <field name="membership_state" string="Subscription status"/>
                             <field name="member_type_id" string="Subscription type" attrs="{'invisible': [('is_company', '=', False)]}"/>
@@ -118,9 +118,10 @@
                             <field name="is_organization" attrs="{'invisible': [('is_company', '=', False)]}"/>
                             <field name="is_volunteer" attrs="{'invisible': [('is_company','=', True)]}"/>
                             <field name="orga_choice" attrs="{'invisible':[('is_company','=',True)]}"/>
+                            <field name="account_cyclos" string="Account Cyclos"/>
                         </group>
                         <group>
-                            <field name="function" placeholder="e.g. Sales Director" attrs="{'invisible': [('is_company','=', True)]}"/>
+                            <field name="function" invisible="1" placeholder="e.g. Sales Director" attrs="{'invisible': [('is_company','=', True)]}"/>
                             <label for="phone"/>
                             <div class="o_row">
                                 <field name="phone" widget="phone"/>
@@ -143,8 +144,8 @@
                                 <i class="fa fa-ban" style="color: red;" role="img" title="This email is blacklisted for mass mailing" aria-label="Blacklisted" attrs="{'invisible': [('is_blacklisted', '=', False)]}" groups="base.group_user"/>
                                 <field name="email" widget="email"/>
                             </div>
-                            <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
-                            <field name="category_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" placeholder="Tags..."/>
+                            <field name="website" invisible="1" widget="url" placeholder="e.g. www.odoo.com"/>
+                            <field name="category_id" invisible="1" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}" placeholder="Tags..."/>
                         </group>
                     </group>
 
@@ -356,11 +357,11 @@
                                                 <label for="street" string="Address"/>
                                                 <div>
                                                     <div class="o_address_format" name="div_address">
-                                                        <field name="street" placeholder="Street..." class="o_address_street"/>
-                                                        <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                                        <field name="street" attrs="{'invisible': [('is_company', '=', False)]}" placeholder="Street..." class="o_address_street"/>
+                                                        <field name="street2" attrs="{'invisible': [('is_company', '=', False)]}"  placeholder="Street 2..." class="o_address_street"/>
                                                         <field name="zip_id" options="{'create_name_field': 'city', 'no_open': True, 'no_create': True}" placeholder="City completion" class="oe_edit_only"/>
                                                         <field name="city" placeholder="City" class="o_address_city"/>
-                                                        <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" context="{'country_id': country_id, 'zip': zip}"/>
+                                                        <field name="state_id" invisible="1" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}" context="{'country_id': country_id, 'zip': zip}"/>
                                                         <field name="zip" placeholder="ZIP" class="o_address_zip"/>
                                                         <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
                                                     </div>

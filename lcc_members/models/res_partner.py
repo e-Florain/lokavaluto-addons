@@ -147,6 +147,12 @@ class res_partner(models.Model):
         domain="[('is_organization', '=', 'True')]"
     )
 
+    account_cyclos = fields.Boolean(
+        string=_("Account Cyclos"),
+        required=False,
+        translate=False,
+        readonly=False
+    )
 
     @api.onchange('firstname', 'lastname')
     def onchange_upper_name(self):
