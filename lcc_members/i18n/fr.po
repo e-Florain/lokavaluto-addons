@@ -237,12 +237,15 @@ msgstr ""
 msgid "Currency exchange office"
 msgstr "Comptoir de change"
 
+#: model:ir.model.fields,field_description:lcc_members.field_res_partner__is_organization
 msgid "is Organization"
 msgstr "Est une association"
 
+#: model:ir.model.fields,field_description:lcc_members.field_res_partner__account_cyclos
 msgid "Account Cyclos"
 msgstr "Compte Cyclos"
 
+#: model:ir.model.fields,field_description:lcc_members.field_res_partner__orga_choice
 msgid "Organization choice"
 msgstr "Choix de l'association"
 
