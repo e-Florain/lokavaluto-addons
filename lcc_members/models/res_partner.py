@@ -104,6 +104,29 @@ class res_partner(models.Model):
         readonly=False,
     )
 
+    is_organization = fields.Boolean(
+        string=_("is Organization"),
+        required=False,
+        translate=False,
+        readonly=False
+    )
+
+    orga_choice = fields.Many2one(
+        'res.partner',
+        string=_("Organization choice"),
+        required=False,
+        translate=False,
+        readonly=False,
+        domain="[('is_organization', '=', 'True')]"
+    )
+
+    account_cyclos = fields.Boolean(
+        string=_("Account Cyclos"),
+        required=False,
+        translate=False,
+        readonly=False
+    )
+
     @api.model
     def create(self, vals):
         """When creating, if partner_profile is not defined by a previous process, the defaut value is Main"""
