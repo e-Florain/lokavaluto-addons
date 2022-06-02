@@ -249,6 +249,10 @@ msgstr "Compte Cyclos"
 msgid "Organization choice"
 msgstr "Choix de l'association"
 
+#: model:ir.model.fields,field_description:lcc_members.field_res_partner__commercial_name
+msgid "Commercial Name"
+msgstr "Nom Commercial"
+
 #. module: lcc_members
 #: model_terms:ir.ui.view,arch_db:lcc_members.members_search_view
 msgid "Customers"

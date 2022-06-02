@@ -127,6 +127,10 @@ class res_partner(models.Model):
         readonly=False
     )
 
+    commercial_name = fields.Text(
+        string=_("Commercial Name"), required=False, translate=False, readonly=False
+    )
+
     @api.model
     def create(self, vals):
         """When creating, if partner_profile is not defined by a previous process, the defaut value is Main"""
