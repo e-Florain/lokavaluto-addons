@@ -46,6 +46,7 @@
             </xpath>
             <xpath expr="//field[@name='vat']" position="replace">
                 <field name="commercial_name" attrs="{'invisible': [('is_company', '=', False)]}"/>
+                <field name="contact_email" attrs="{'invisible': [('is_company', '=', False)]}"/>
                 <field name="membership_state" string="Subscription status"/>
                 <field name="member_type_id" string="Subscription type"/>
                 <field name="currency_exchange_office" attrs="{'invisible': [('is_company', '=', False)]}"/>

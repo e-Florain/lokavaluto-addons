@@ -139,6 +139,10 @@ class res_partner(models.Model):
         string=_("Change euros mensuel"), required=False, translate=False, readonly=False
     )
 
+    contact_email = fields.Text(
+        string=_("Contact Email"), required=False, translate=False, readonly=False
+    )
+
     @api.model
     def create(self, vals):
         """When creating, if partner_profile is not defined by a previous process, the defaut value is Main"""
