@@ -164,8 +164,8 @@ msgstr "Nom commercial"
 
 #. module: lcc_members
 #: model_terms:ir.ui.view,arch_db:lcc_members.main_members_view
-msgid "Contact Email"
-msgstr "Email de contact"
+msgid "Email Cyclos"
+msgstr "Email du compte Cyclos"
 
 #. module: lcc_members
 #: model_terms:ir.ui.view,arch_db:lcc_members.main_members_view

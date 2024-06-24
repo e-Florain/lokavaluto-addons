@@ -140,7 +140,7 @@ class res_partner(models.Model):
     )
 
     contact_email = fields.Text(
-        string=_("Contact Email"), required=False, translate=False, readonly=False
+        string=_("Email Cyclos"), required=False, translate=False, readonly=False
     )
 
     @api.model
