@@ -135,6 +135,10 @@ class res_partner(models.Model):
         string=_("Accepte Newsletter"), required=False, translate=False, readonly=False
     )
 
+    prvlt_sepa = fields.Boolean(
+        string=_("Prélèvement SEPA"), required=False, translate=False, readonly=False
+    )
+
     changeeuros = fields.Text(
         string=_("Change euros mensuel"), required=False, translate=False, readonly=False
     )

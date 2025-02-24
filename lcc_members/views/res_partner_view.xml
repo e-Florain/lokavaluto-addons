@@ -59,6 +59,7 @@
                 <field name="ref" string="Subcription number"/>
                 <field name="accept_newsletter" attrs="{'invisible': [('is_company', '=', True)]}"/>
                 <field name="changeeuros" attrs="{'invisible': [('is_company', '=', True)]}"/>
+                <field name="prvlt_sepa"/>
             </xpath>
 
             <xpath expr="//field[@name='phone']" position="replace">
