@@ -1,8 +1,9 @@
-# Copyright 2020 Lokavaluto ()
+# Copyright  from 2020 Lokavaluto ()
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
@@ -11,6 +12,7 @@ _logger = logging.getLogger(__name__)
 class res_partner(models.Model):
     _inherit = "res.partner"
 
+    business_name = fields.Char(string=_("Business Name"))
     reasons_choosing_mlc = fields.Text(
         string=_("Why did I choose local currency"),
         required=False,
@@ -19,10 +21,7 @@ class res_partner(models.Model):
     )
     phone_pro = fields.Char(
         string=_("Professional phone"), required=False, translate=False, readonly=False
-    )
-    member_comment = fields.Text(
-        string=_("Member comment"), required=False, translate=False, readonly=False
-    )
+    ) ## TODO: delete this field as it is now in function or public profiles
     member_type_id = fields.Many2one(
         "member.type",
         string=_("Member's type"),
@@ -39,12 +38,6 @@ class res_partner(models.Model):
     to_renew = fields.Boolean(
         string=_("To renew"), required=False, translate=False, readonly=False
     )
-    legal_activity_code = fields.Char(
-        string=_("legal activity code (ex. APE in France)"),
-        required=False,
-        translate=False,
-        readonly=False,
-    )
     keywords = fields.Text(
         string=_("keywords"), required=False, translate=True, readonly=False
     )
@@ -59,15 +52,6 @@ class res_partner(models.Model):
     )
     is_volunteer = fields.Boolean(
         string=_("Is volunteer"), required=False, translate=False, readonly=False
-    )
-    private_comment = fields.Text(  ## TODO v4 : TO BE DELETED
-        string=_("Private comment"), required=False, translate=False, readonly=False
-    )
-    convention_specific_agreement = fields.Text(  ## TODO v4 : TO BE DELETED
-        string=_("Convention specific agreement"),
-        required=False,
-        translate=False,
-        readonly=False,
     )
     convention_agreement = fields.Binary(
         string=_("Convention agreement"),
@@ -84,21 +68,11 @@ class res_partner(models.Model):
         string="Discount",
         translate="True",
     )
-    partner_image_ids = fields.One2many(  ## TODO v4 : TO BE DELETED
-        "partner.image", "partner_id", string="Images"
-    )
     accept_coupons = fields.Boolean(
         string=_("Accept coupons"), required=False, translate=False, readonly=False
     )
     accept_digital_currency = fields.Boolean(
         string=_("Accept digital currency"),
-        required=False,
-        translate=False,
-        readonly=False,
-    )
-    partner_profile = fields.Many2one(
-        "partner.profile",
-        string=_("Partner profile"),
         required=False,
         translate=False,
         readonly=False,
@@ -127,10 +101,17 @@ class res_partner(models.Model):
         readonly=False
     )
 
+    prvlt_sepa = fields.Boolean(
+        string=_("Prélèvement SEPA"),
+        required=False, 
+        translate=False, 
+        readonly=False
+    )
+
     commercial_name = fields.Text(
         string=_("Commercial Name"), required=False, translate=False, readonly=False
     )
-
+    
     accept_newsletter = fields.Boolean(
         string=_("Accepte Newsletter"), required=False, translate=False, readonly=False
     )
@@ -143,14 +124,63 @@ class res_partner(models.Model):
         string=_("Email Cyclos"), required=False, translate=False, readonly=False
     )
 
-    @api.model
-    def create(self, vals):
-        """When creating, if partner_profile is not defined by a previous process, the defaut value is Main"""
-        modified_self = self._basecontact_check_context("create")
-        if not vals.get("partner_profile") and not vals.get("contact_id"):
-            profile = self.env.ref("lcc_members.parter_profile_main").read()[0]
-            vals["partner_profile"] = profile["id"]
-        return super(res_partner, modified_self).create(vals)
+    public_name = fields.Char(compute="_compute_public_name", store=True)
+
+    want_newsletter_subscription = fields.Boolean(
+        string=_("Want Newsletters Subscription")
+    )
+    refuse_numeric_wallet_creation = fields.Boolean(
+        string=_("Refuse the creation of a numeric wallet.")
+    )
+    accept_policy = fields.Boolean(string=_("Accept LCC Policy"))
+    website_id = fields.Many2one(compute="_compute_website_id", store=True)
+
+    def _compute_website_id(self):
+        for partner in self:
+            website = self.env["website"].search(
+                [("company_id", "=", partner.company_id.id)], limit=1
+            )
+            partner.website_id = website.id
+
+    @api.depends(
+        "public_profile_id.display_name",
+        "public_profile_id.is_company",
+        "public_profile_id.business_name",
+        "public_profile_id.name",
+    )
+    def _compute_public_name(self):
+        for partner in self:
+            partner.public_name = (
+                partner.public_profile_id[
+                    "business_name"
+                    if partner.public_profile_id.is_company
+                    else "display_name"
+                ]
+                or partner.public_profile_id.name
+            )
+
+    @api.constrains("email")
+    def _check_email_unique(self):
+        for rec in self.filtered("email"):
+            if "," in rec.email:
+                raise UserError(
+                    _(
+                        "Field contains multiple email addresses. This is "
+                        "not supported."
+                    )
+                )
+            if rec.is_main_profile:
+                if self.search_count(
+                    [
+                        ("email", "=", rec.email),
+                        ("id", "!=", rec.id),
+                        ("is_main_profile", "=", True),
+                        ("is_company", "=", rec.is_company),
+                    ]
+                ):
+                    raise UserError(
+                        _("Email '%s' is already in use.") % rec.email.strip()
+                    )
 
     @api.onchange("firstname", "lastname", "is_company")
     def onchange_upper_name(self):
@@ -166,18 +196,6 @@ class res_partner(models.Model):
             and self.firstname != self.firstname.capitalize()
         ):
             self.firstname = self.firstname.capitalize()
-
-    @api.model
-    def search_position_partners(self, profile):
-        if profile:
-            position_partners = self.env["res.partner"].search(
-                [("contact_id", "=", self.id), ("partner_profile", "=", profile)]
-            )
-        else:
-            position_partners = self.env["res.partner"].search(
-                [("contact_id", "=", self.id)]
-            )
-        return position_partners
 
     def _membership_state(self):
         res = super(res_partner, self)._membership_state()
@@ -201,11 +219,24 @@ class res_partner(models.Model):
 
         return res
 
-
-class PartnerImage(models.Model):
-    _name = "partner.image"
-    _description = "Partner Image"
-
-    name = fields.Char("Name")
-    image = fields.Binary("Image", attachment=True)
-    partner_id = fields.Many2one("res.partner", "Related Partner", copy=True)
+    def _get_public_profile_fields(self):
+        fields = super(res_partner, self)._get_public_profile_fields()
+        lcc_fields = [
+            "business_name",
+            "lastname",
+            "firstname",
+            "website_url",
+            "team_id",
+            "website_description",
+            "industry_id",
+            "detailed_activity",
+            "reasons_choosing_mlc",
+            "itinerant",
+            "accept_coupons",
+            "accept_digital_currency",
+            "phone_pro",
+            "opening_time",
+            "discount",
+        ]
+        fields.extend(lcc_fields)
+        return fields
